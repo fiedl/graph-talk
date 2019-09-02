@@ -27,7 +27,8 @@ jobs:
         mkdir public
         cp latex-beamer/build/*.pdf public/
     - name: GitHub Pages Deploy
-      uses: gr2m/ghpages-1@v0.2.1
+      uses: maxheld83/ghpages@v0.2.1
       env:
         BUILD_DIR: public/
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_PAT: ${{ secrets.GH_PAT }}
