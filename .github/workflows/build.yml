@@ -16,7 +16,7 @@ jobs:
       run: |
         mkdir -p latex-beamer/build/text
     - name: Compile LaTeX document
-      uses: xu-cheng/latex-action@master
+      uses: fiedl/latex-action@master
       with:
         root_file: talk.tex
         working_directory: latex-beamer
