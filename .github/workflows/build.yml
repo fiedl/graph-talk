@@ -28,6 +28,7 @@ jobs:
         cp latex-beamer/build/*.pdf public/
     - name: Convert PDF to PNG for slide previews
       run: |
+        replace '<policy domain="coder" rights="none" pattern="PDF" />' '<policy domain="coder" rights="read|write" pattern="PDF" />' -- /etc/ImageMagick-6/policy.xml
         cd public
         find . -type f -name '*.pdf' -print0 |
           while IFS= read -r -d '' file
