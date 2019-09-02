@@ -21,4 +21,4 @@ jobs:
         root_file: talk.tex
         working_directory: latex-beamer
         args: "--output-directory=build -pdf -file-line-error -interaction=nonstopmode"
-        extra_packages: "texlive-fontsextra"
+        extra_packages: "cm-super"
