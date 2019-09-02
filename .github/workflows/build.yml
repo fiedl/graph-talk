@@ -1,6 +1,6 @@
 name: build
 
-on: 
+on:
   push:
     branches:
     - master
@@ -12,6 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: "Create required directories"
+      run: |
+        mkdir -p latex-beamer/build/text
     - name: Compile LaTeX document
       uses: xu-cheng/latex-action@master
       with:
