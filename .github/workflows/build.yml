@@ -22,3 +22,11 @@ jobs:
         working_directory: latex-beamer
         args: "--output-directory=build -pdf -file-line-error -interaction=nonstopmode -shell-escape"
         extra_packages: "cm-super"
+    - name: Copy PDF output
+      run: |
+        mkdir public
+        cp latex-beamer/build/*.pdf public/
+    - name: GitHub Pages Deploy
+      uses: maxheld83/ghpages@v0.2.1
+      env:
+        BUILD_DIR: public/
