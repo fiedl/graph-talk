@@ -1,0 +1,46 @@
+%!TEX TS-program = ./make.zsh
+
+\documentclass[green, 12pt]{beamer}
+
+% https://gist.github.com/andrejbauer/ac361549ac2186be0cdb
+%\setbeameroption{show notes}
+
+\newlength{\mypaperwidth}\setlength{\mypaperwidth}{200mm}
+%\geometry{paperwidth=\mypaperwidth,paperheight=0.625\mypaperwidth} % 16:10
+\geometry{paperwidth=\mypaperwidth,paperheight=0.7\mypaperwidth}
+
+\title{Working with Graph Data in Ruby}
+\subtitle{RUG-N Meeting October 2019}
+\date{\today \\ \vspace*{2mm} \tiny{Document 2019-Roh0noo1} \normalsize}
+
+\author[Sebastian Fiedlschuster]{Sebastian Fiedlschuster \\ \tiny{\url{https://github.com/fiedl/graph-talk}} \\ \tiny\texttt{sebastian@fiedlschuster.de}}
+%\institute{}
+
+\input{lib/graphics}
+\input{lib/listings}
+\input{lib/tabular}
+\input{lib/beamer}
+\input{lib/utf8}
+\input{lib/units}
+\input{lib/todo}
+
+\usepackage{gitdags}
+
+%\includeonly{}
+
+\begin{document}
+
+% Warning: Do not indent \frame statements.
+% This can lead to "Fatal error occurred, no output PDF file produced!"
+% https://tex.stackexchange.com/a/225582/70789
+
+\include{text/titlepage}
+
+%\section{Introduction}
+%\include{text/motivation}
+
+\appendix
+\section{Backup slides}
+
+
+\end{document}
