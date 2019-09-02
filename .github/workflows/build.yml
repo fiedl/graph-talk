@@ -20,5 +20,5 @@ jobs:
       with:
         root_file: talk.tex
         working_directory: latex-beamer
-        args: "--output-directory=build -pdf -file-line-error -interaction=nonstopmode"
+        args: "--output-directory=build -pdf -file-line-error -interaction=nonstopmode -shell-escape"
         extra_packages: "cm-super"
