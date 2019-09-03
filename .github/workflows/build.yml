@@ -27,13 +27,10 @@ jobs:
         mkdir public
         cp latex-beamer/build/*.pdf public/
     - name: Convert PDF to PNG for slide previews
-      run: |
-        replace '<policy domain="coder" rights="none" pattern="PDF" />' '<policy domain="coder" rights="read|write" pattern="PDF" />' -- /etc/ImageMagick-6/policy.xml
-        cd public
-        find . -type f -name '*.pdf' -print0 |
-          while IFS= read -r -d '' file
-            do convert -verbose -density 500 -resize 800 "${file}" "${file%.*}.png"
-          done
+      uses: fiedl/pdf2png-action@master
+      with:
+        root_dir: public
+        match: "*.pdf"
     - name: GitHub Pages Deploy
       uses: maxheld83/ghpages@v0.2.1
       env:
