@@ -1,99 +1,83 @@
 %!TEX TS-program = ../make.zsh
 
-\newcommand\samplegraph[1]{
-  \directlua{
-    function apply_styles (styles)
-      for style in string.gmatch(styles, "hide[^,]*") do
-        style_to_hide = string.gsub(style, "hide", "")
-        tex.sprint("\\tikzset{" .. style_to_hide .. "/.style={opacity=0, draw=none, text=white, fill=white!0}}")
-      end
-    end
-  }
-
-  \centering\begin{tikzpicture}[
-      every node/.style={circle, draw},
-      group/.style={fill=green!50},
-      user/.style={fill=yellow!30},
-      page/.style={fill=blue!40},
-      link/.style={circle connection bar, fill},
-      bglink/.style={link, fill=black!10},
-    ]
-    \directlua{apply_styles("#1")}
-
-    \graph [
-        tree layout,
-        nodes={circle},
-        edges={link},
-        grow=down,
-        level distance=0.5in,
-        sibling distance=0.5in
-        ] {
-      Jeder [group] -> [supergroupstructure] Alle Mitglieder [group,supergroupstructure];
-      Jeder -> Ortsgruppen [group];
-      Jeder -> [supergroupstructure] Alle Amtsträger [group,supergroupstructure];
-
-      Ortsgruppen -> {
-        Berlin [group],
-        Halle [group],
-        Nürnberg [group]
-      };
-
-      Nürnberg -> {
-        Studenten [group],
-        Alumni [group],
-        Gäste [group]
-      };
-
-      Studenten -> {
-        Studenten Protokolle/"Protokolle" [page],
-        Max [user],
-        Lena [user],
-        Nürnberg Studenten Amtsträger/"Amtsträger" [group] -> {
-          Nürnberg Studenten Schriftwart/"Schriftwart" [group]
-        }
-      };
-
-      Nürnberg Studenten Schriftwart -> Lena;
-
-      Alumni -> {
-        Alumni Protokolle/"Protokolle" [page],
-        Hans [user],
-        Gretel [user],
-        Nürnberg Alumni Amtsträger/"Amtsträger" [group] -> {
-          Nürnberg Alumni Schriftwart/"Schriftwart" [group]
-        }
-      };
-
-      Nürnberg Alumni Schriftwart -> Gretel;
-
-      Gäste -> Peter [user];
-
-      Alle Amtsträger -> [supergroupstructure] Alle Schriftwarte [group,supergroupstructure] -> [supergroupstructure] Leitfaden [page,supergroupstructure];
-
-      Alle Mitglieder -> [supergroupstructure] Verbandszeitschrift [page,supergroupstructure] -> [supergroupstructure] Ausgabe 1 [page,supergroupstructure];
-    };
-
-    \begin{pgfonlayer}{background}
-      \path (Alle Schriftwarte) to [bglink,supergroupstructure] (Nürnberg Studenten Schriftwart);
-      \path (Alle Schriftwarte) to [bglink,supergroupstructure] (Nürnberg Alumni Schriftwart);
-
-      \path (Alle Mitglieder) to [bglink,supergroupstructure] (Studenten);
-      \path (Alle Mitglieder) to [bglink,supergroupstructure] (Alumni);
-    \end{pgfonlayer}
-
-    \path (Max) to [link, edge label={node [validityrange] {Foo}}] (Studenten);
-    \path (Max) to [bglink, edge label={node [validityrange] {Bar}}] (Alumni);
-
-  \end{tikzpicture}
-}
-
 \begin{frame}[fragile]{Motivation and Scope}
 
   \begin{columns}
     \begin{column}{0.6\textwidth}
       \scalebox{0.5}{
-        \only<1>{\samplegraph{hidesupergroupstructure}}
-        \only<2>{\samplegraph{}}
+        \centering\begin{tikzpicture}[
+            group/.style={circle, draw, fill=green!50},
+            user/.style={circle, draw, fill=yellow!30},
+            page/.style={circle, draw, fill=blue!40},
+            link/.style={circle connection bar, fill},
+            bglink/.style={link, fill=black!10},
+          ]
+
+          \graph [
+              tree layout,
+              nodes={circle},
+              edges={link},
+              grow=down,
+              level distance=0.5in,
+              sibling distance=0.5in
+              ] {
+            Jeder [group] -> Alle Mitglieder [group];
+            Jeder -> Ortsgruppen [group];
+            Jeder -> Alle Amtsträger [group];
+
+            Ortsgruppen -> {
+              Berlin [group],
+              Halle [group],
+              Nürnberg [group]
+            };
+
+            Nürnberg -> {
+              Studenten [group],
+              Alumni [group],
+              Gäste [group]
+            };
+
+            Studenten -> {
+              Studenten Protokolle/"Protokolle" [page],
+              Max [user],
+              Lena [user],
+              Nürnberg Studenten Amtsträger/"Amtsträger" [group] -> {
+                Nürnberg Studenten Schriftwart/"Schriftwart" [group]
+              }
+            };
+
+            Nürnberg Studenten Schriftwart -> Lena;
+
+            Alumni -> {
+              Alumni Protokolle/"Protokolle" [page],
+              Hans [user],
+              Gretel [user],
+              Nürnberg Alumni Amtsträger/"Amtsträger" [group] -> {
+                Nürnberg Alumni Schriftwart/"Schriftwart" [group]
+              }
+            };
+
+            Nürnberg Alumni Schriftwart -> Gretel;
+
+            Gäste -> Peter [user];
+
+            Alle Amtsträger -> Alle Schriftwarte [group] -> Leitfaden [page];
+
+            Alle Mitglieder -> Verbandszeitschrift [page] -> Ausgabe 1 [page];
+          };
+
+          \begin{pgfonlayer}{background}
+            \path (Alle Schriftwarte) to [bglink] (Nürnberg Studenten Schriftwart);
+            \path (Alle Schriftwarte) to [bglink] (Nürnberg Alumni Schriftwart);
+
+            \path (Alle Mitglieder) to [bglink] (Studenten);
+            \path (Alle Mitglieder) to [bglink] (Alumni);
+          \end{pgfonlayer}
+
+          \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_to: 2009} (Studenten);
+          \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_from: 2009} (Alumni);
+
+        \end{tikzpicture}
       }
     \end{column}
 
