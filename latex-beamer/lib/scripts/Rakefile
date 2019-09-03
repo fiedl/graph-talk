@@ -30,7 +30,7 @@ def pdf_file
 end
 
 def pdflatex_command
-  "pdflatex --output-directory=build -interaction=nonstopmode -file-line-error-style -shell-escape"
+  "lualatex --output-directory=build -interaction=nonstopmode -file-line-error-style -shell-escape"
 end
 
 def include_only_a_part?
