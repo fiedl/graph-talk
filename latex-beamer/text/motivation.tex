@@ -1,0 +1,74 @@
+%!TEX TS-program = ../make.zsh
+
+\begin{frame}[fragile]{Motivation and Scope}
+
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \centering\begin{tikzpicture}[scale=0.8, small mindmap,
+        %root concept/.append style={grow=0},
+        %level 1 concept/.append style={grow=0},
+        %level 1 concept/.append style={level distance=130,sibling angle=30},
+        %extra concept/.append style={color=blue!50,text=black},
+        %concept/.append style={sibling distance=10mm, grow=0},
+        %level 1 concept/.append style={sibling distance=40},
+        %level 2 concept/.append style={sibling distance=40},
+        group/.style={concept, concept color=green!50},
+        user/.style={concept, concept color=yellow!30},
+        page/.style={concept, concept color=blue!40}]
+
+        \node [group] {Jeder}
+          [sibling distance=100]
+          child {node [group] (alle mitglieder) {Alle Mitglieder}}
+          child {node [group] {Orts-Gruppen}
+            child {node [group] {Berlin}}
+            child {node [group] {Halle}}
+            child {node [group] {Nürnberg}
+              child {node [group] (n studenten) {Studenten}
+                child {node [page] {Protokolle}}
+                child {node [user] (max) {Max}}
+                child {node [user] (lena) {Lena}}
+                child {node [group] {Amtsträger}
+                  child {node [group] (n studenten schriftwart) {Schriftwart}}
+                }
+              }
+              child {node [group] (n alumni) {Alumni}
+                child {node [page] {Protokolle}}
+                child {node [user] (hans) {Hans}}
+                child {node [user] (gretel) {Gretel}}
+                child {node [group] {Amtsträger}
+                  child {node [group] (n alumni schriftwart) {Schriftwart}}
+                }
+              }
+              child {node [group] {Gäste}
+                child {node [user] {Peter}}
+              }
+            }
+          }
+          child {node [group] {Alle Amtsträger}
+            child {node [group] (alle schriftwarte) {Alle Schriftwarte}}
+          }
+        ;
+
+        \begin{pgfonlayer}{background}
+          \path (n studenten schriftwart) to [circle connection bar] (lena);
+          \path (n alumni schriftwart) to [circle connection bar] (gretel);
+          \path (alle schriftwarte) to [circle connection bar] (n alumni schriftwart);
+          \path (alle schriftwarte) to [circle connection bar] (n studenten schriftwart);
+
+          \path (alle mitglieder) to [circle connection bar] (n studenten);
+          \path (alle mitglieder) to [circle connection bar] (n alumni);
+        \end{pgfonlayer}
+      \end{tikzpicture}
+    \end{column}
+
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+        \item Sometimes we need to model data as graphs: nodes with connections.
+        \item Queries should be expressive: \inlineruby{Group.first.descendant_groups}.
+        \item Compare several approaches how to do this with ruby.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
