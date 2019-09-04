@@ -4,6 +4,7 @@
 # Just type `rake` to run it.
 
 require 'pry'
+require 'erb'
 
 task :default => [:info, :compile, :open]
 
@@ -108,7 +109,34 @@ file "build/#{project_name}.bbl" do
   end
 end
 
-task :preprocessing => [:markdown]
+task :preprocessing => [:erb, :markdown]
+
+def erb_files
+  if include_only_a_part?
+    if current_tex_file.include? ".erb"
+      ["build/" + current_tex_file.gsub(base_path + "/", "")]
+    else
+      []
+    end
+  else
+    FileList["build/text/*.tex.md.erb"]
+  end
+end
+
+task :erb => [:copy_files_to_build_directory, :erb_info] + erb_files.ext('')
+
+task :erb_info do
+  log.section "Preprocessing erb files"
+  log.info erb_files.join("\n")
+end
+
+erb_files.each do |source|
+  file source.ext('') => source do |t|
+    log.info "Converting #{t.source} to #{t.name}."
+    converted_content = ERB.new(File.read(t.source)).result
+    File.write(t.name, converted_content)
+  end
+end
 
 def markdown_files
   if include_only_a_part?
