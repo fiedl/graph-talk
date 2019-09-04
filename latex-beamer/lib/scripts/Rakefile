@@ -174,3 +174,15 @@ task :clean do
   log.section "Cleaning up"
   sh "rm -r #{build_path}"
 end
+
+# From within erb files, you may call `render` to include other erb files.
+#
+#    <%= render 'sample', foo: "bar" %>
+#
+# Here, "sample" is the title of a "sample.tex.erb" file inside the "text" folder.
+#
+def render(file, locals = {})
+  erb_context = binding
+  locals.each { |key, value| erb_context.local_variable_set(key, value) }
+  ERB.new(File.read("build/text/#{file}.tex.erb"), nil, nil, '_sub01').result(erb_context)
+end
