@@ -12,52 +12,54 @@
 
     \begin{column}{0.7\textwidth}
       \vspace*{-0.5cm}
-      \begin{ruby}
-        class Group < ApplicationRecord
-          has_many :direct_members, # ...
-          has_many :child_groups, # ...
 
-          def members
-            direct_members + child_groups.map(&:members).flatten
-          end
-        end
-      \end{ruby}
+      \begin{itemize}
+        \item<only@1-> Idea: Use recursive defintion of `members`:
 
-      \medskip
+          \begin{ruby}
+            class Group < ApplicationRecord
+              has_many :direct_members, # ...
+              has_many :child_groups, # ...
+              has_one :parent_group, # ...
 
-      **Implementation**: \url{https://github.com/amerine/acts_as_tree/blob/master/lib/acts_as_tree.rb} by DHH
+              def members
+                direct_members + child_groups.map(&:members).flatten
+              end
+            end
+          \end{ruby}
 
-      \only<2->{**Pros**: Simple, no redundancies}
+        \item<only@2-4> **Implementation**: \url{https://github.com/amerine/acts_as_tree/blob/master/lib/acts_as_tree.rb} by DHH
 
-      \only<3->{**Cons**: Performance}
+        \item<only@3-4> **Pros**: Simple, no redundancies
 
-      \medskip
-      \begin{onlyenv}<4->
-        % How to test this in your_platform `rails console`:
-        %
-        %     # rails console
-        %     class Group
-        %       def test_members
-        %         child_users + child_groups.map(&:test_members).flatten
-        %       end
-        %     end
-        %
-        %     Group.find(2).descendant_groups.count
-        %     Group.find(2).descendant_users.count
-        %     Group.find(2).descendant_users.collect { |user| user.links_as_child }.flatten.count
-        %
-        %     Benchmark.measure { members = Group.find(2).test_members }
-        %
-        \begin{ruby}
-          # Test data set:
-          Group.count  # => 4126
-          User.count   # => 6204
-          Edge.count   # => 36134
-          Benchmark.measure { Group.find_by(name: "Ortsgruppen").members }  # => 19.04 seconds
-          Benchmark.measure { Group.find_by(name: "Nürnberg").members }  # => 0.53 seconds
-        \end{ruby}
-      \end{onlyenv}
+        \item<only@4-4> **Cons**: Performance
 
+        \item<only@5->
+          % How to test this in your_platform `rails console`:
+          %
+          %     # rails console
+          %     class Group
+          %       def test_members
+          %         child_users + child_groups.map(&:test_members).flatten
+          %       end
+          %     end
+          %
+          %     Group.find(2).descendant_groups.count
+          %     Group.find(2).descendant_users.count
+          %     Group.find(2).descendant_users.collect { |user| user.links_as_child }.flatten.count
+          %
+          %     Benchmark.measure { members = Group.find(2).test_members }
+          %
+          \begin{ruby}
+            # Test data set:
+            Group.count  # => 4126
+            User.count   # => 6204
+            Edge.count   # => 36134
+            Benchmark.measure { Group.find_by(name: "Ortsgruppen").members }  # => 19.04 seconds
+            Benchmark.measure { Group.find_by(name: "Nürnberg").members }  # => 0.53 seconds
+          \end{ruby}
+
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
