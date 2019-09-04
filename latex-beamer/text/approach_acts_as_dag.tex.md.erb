@@ -9,6 +9,7 @@
         \centering
         \only<1-2,4>{<%= render "sample_graph", except: [:pages, :time] %>}%
         \only<3>{<%= render "sample_graph", except: [:pages, :time], highlight: :stud_links %>}%
+        \only<5>{<%= render "sample_graph", except: [:pages, :time], show_indirect_links: true %>}%
       }
     \end{column}
 
@@ -56,6 +57,19 @@
               # <DagLink descendant: "Schriftwart",
               #   direct: false, count: 1, ...>
           \end{ruby}
+
+        \item<only@4-> **Pros**:
+          \begin{itemize}
+            \item Easy-to-use interface
+            \item Find out descendants or ancestors in only one query.
+          \end{itemize}
+
+        \item<only@5-> **Cons**:
+          \begin{itemize}
+            \item Adding or removing a link is expensive.
+            \item Moving a node may take several days!
+            \item If interrupted, one may need to recalculate the indirect links of the whole graph.
+          \end{itemize}
 
       \end{itemize}
     \end{column}

@@ -13,6 +13,7 @@ show_officer_assignments = true if show_officer_assignments.nil?
 show_all_members = true if show_all_members.nil?
 show_pages = true if show_pages.nil?
 show_time = true if show_time.nil?
+show_indirect_links = false if show_indirect_links.nil?
 
 if only.include? :tree
   show_officers = false
@@ -39,6 +40,7 @@ highlight_stud_links = true if highlight.include? :stud_links
     link/.style={circle connection bar, fill},
     bglink/.style={link, fill=black!10},
     highlightpath/.append style={circle connection bar switch color=from (red) to (red)},
+    indirectlink/.append style={circle connection bar switch color=from (black!30) to (black!30)}
   ]
 
   \graph [
@@ -99,6 +101,25 @@ highlight_stud_links = true if highlight.include? :stud_links
   };
 
   \begin{pgfonlayer}{background}
+    <% if show_indirect_links %>
+      <% indirect_links = {
+        "Jeder" => "Berlin,Halle,Nürnberg,Alle Schriftwarte,Studenten,Alumni,Gäste,Max,Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart,Hans,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart,Peter".split(","),
+        "Alle Mitglieder" => "Studenten,Alumni,Max,Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart,Hans,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart".split(","),
+        "Ortsgruppen" => "Studenten,Alumni,Gäste,Max,Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart,Hans,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart,Peter".split(","),
+        "Alle Amtsträger" => "Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart".split(","),
+        "Nürnberg" => "Max,Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart,Hans,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart,Peter".split(","),
+        "Studenten" => "Max,Lena,Nürnberg Studenten Amtsträger,Nürnberg Studenten Schriftwart".split(","),
+        "Alumni" => "Hans,Gretel,Nürnberg Alumni Amtsträger,Nürnberg Alumni Schriftwart".split(","),
+        "Nürnberg Studenten Amtsträger" => "Lena".split(","),
+        "Nürnberg Alumni Amtsträger" => "Gretel".split(","),
+      } %>
+      <% for ancestor, descendants in indirect_links %>
+        <% for descendant in descendants %>
+          \path (<%= ancestor %>) to [indirectlink] (<%= descendant %>);
+        <% end %>
+      <% end %>
+    <% end %>
+
     <% if show_all_officers %>
       \path (Alle Schriftwarte) to [bglink] (Nürnberg Studenten Schriftwart);
       \path (Alle Schriftwarte) to [bglink] (Nürnberg Alumni Schriftwart);
