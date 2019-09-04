@@ -168,6 +168,9 @@ rule ".tex" => ".tex.md" do |t|
   log.info "-> Converting **bold text** to \\textbf{bold text}"
   content = content.gsub(/\*\*([^\*]*)\*\*/, '\textbf{\1}')
 
+  log.info "-> Converting *italic text* to \\textit{italic text}"
+  content = content.gsub(/\*([^\*]*)\*/, '\textit{\1}')
+
   #sh "cat #{t.source} |sed '/^%/d' > #{t.source.ext('tmp')}" # remove tex comments
 
   log.info "-> running pandoc markdown converter:"
