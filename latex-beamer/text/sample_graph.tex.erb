@@ -14,17 +14,20 @@ show_all_members = true if show_all_members.nil?
 show_pages = true if show_pages.nil?
 show_time = true if show_time.nil?
 show_indirect_links = false if show_indirect_links.nil?
+show_events = true if show_events.nil?
 
 if only.include? :tree
   show_officers = false
   show_all_officers = false
   show_all_members = false
+  show_events = false
 end
 
 show_pages = false if except.include? :pages
 show_time = false if except.include? :time
 show_all_members = false if except.include? :all_members
 show_all_officers = false if except.include? :all_officers
+show_events = false if except.include? :events
 
 highlight_all_members ||= false
 highlight_all_officers ||= false
@@ -39,6 +42,7 @@ highlight_stud_links = true if highlight.include? :stud_links
     group/.style={circle, draw, fill=green!50},
     user/.style={circle, draw, fill=yellow!30},
     page/.style={circle, draw, fill=blue!40},
+    event/.style={circle, draw, fill=yellow!150},
     link/.style={circle connection bar, fill},
     bglink/.style={link, fill=black!10},
     highlightpath/.append style={circle connection bar switch color=from (red) to (red)},
@@ -100,6 +104,17 @@ highlight_stud_links = true if highlight.include? :stud_links
 
     <% if show_all_officers %> Alle Amtsträger -> Alle Schriftwarte [group] <% if show_pages %> -> Leitfaden [page] <% end %>; <% end %>
     <% if show_all_members %> Alle Mitglieder <% if show_pages %> -> Verbandszeitschrift [page] -> Ausgabe 1 [page] <% end %>; <% end %>
+
+    <% if show_events %>
+      Studenten -> Sommerfest [event] -> {
+        Teilnehmer [group],
+        Organisatoren [group]
+      };
+
+      <% if show_pages %>
+        Teilnehmer -> Programmheft [page];
+      <% end %>
+    <% end %>
   };
 
   \begin{pgfonlayer}{background}
@@ -130,6 +145,12 @@ highlight_stud_links = true if highlight.include? :stud_links
     <% if show_all_members %>
       \path (Alle Mitglieder) to [bglink] (Studenten);
       \path (Alle Mitglieder) to [bglink] (Alumni);
+    <% end %>
+
+    <% if show_events %>
+      \path (Organisatoren) to [bglink] (Lena);
+      \path (Teilnehmer) to [bglink] (Max);
+      \path (Teilnehmer) to [bglink] (Gretel);
     <% end %>
   \end{pgfonlayer}
 
