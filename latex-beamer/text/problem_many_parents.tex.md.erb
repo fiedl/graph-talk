@@ -7,20 +7,29 @@
     \begin{column}{0.4\textwidth}
       \scalebox{0.6}{
         \centering
-        \only<1>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officers: false, show_officer_assignments: false %>}%
-        \only<2>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officer_assignments: false %>}%
-        \only<3>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false %>}%
-        \only<4>{<%= render "sample_graph", except: [:pages, :time], show_all_members: false %>}%
-        \only<5>{<%= render "sample_graph", except: [:pages, :time] %>}%
-        \only<6>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_members %>}%
-        \only<7>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_officers %>}%
+        \only<1-2>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officers: false, show_officer_assignments: false %>}%
+        \only<3>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officer_assignments: false %>}%
+        \only<4>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false %>}%
+        \only<5>{<%= render "sample_graph", except: [:pages, :time], show_all_members: false %>}%
+        \only<6>{<%= render "sample_graph", except: [:pages, :time] %>}%
+        \only<7>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_members %>}%
+        \only<8-9>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_officers %>}%
       }
     \end{column}
 
     \begin{column}{0.6\textwidth}
       \begin{itemize}
-        \item In a tree, each node has only one parent.
-        \item What if we need more than one parent?
+        \item<only@1-6> In a tree, each node has only one parent.
+
+          \begin{ruby}
+            class Group < ApplicationRecord
+              has_many :direct_members, # ...
+              has_many :child_groups, # ...
+              has_one :parent_group, # ...
+            end
+          \end{ruby}
+
+        \item<only@2-6> What if we need more than one parent?
 
           \begin{ruby}
             class Group < ApplicationRecord
@@ -30,29 +39,39 @@
             end
           \end{ruby}
 
-        \item Then we need a DAG, a directed acyclic graph, in which each node can have many children and many parents.
+        \item<only@2-6> DAG = directed acyclic graph
 
-        %\item TODO: Approach ags-as-dag: Implementation: \url{https://github.com/resgraph/acts-as-dag}
+        \item<only@7-9> Usage examples:
+          \begin{itemize}
+            \item<only@7> Find out whether a user is a member of the super organization:
+              \begin{ruby}
+                class User < ApplicationRecord
+                  def organization_member?
+                    Group.find_by(name: "Alle Mitglieder").members.include? self
+                  end
 
-        \item Usage examples:
+                  def guest?
+                    not organization_member?
+                  end
+                end
+              \end{ruby}
+            \item<only@8-9> Write an email to all officers.
+              \begin{ruby}
+                recipient_addresses = Group.find_by("Alle Amtsträger").members.pluck(:email)
+              \end{ruby}
+            \item<only@9> Assign abilities to officers.
+              \begin{ruby}
+                class Ability
+                  include CanCan::Ability
 
-          \begin{ruby}
-
-            # Find out whether a user is a member of the whole organization:
-            class User < ApplicationRecord
-              def organization_member?
-                Group.find_by(name: "Alle Mitglieder").members.include? self
-              end
-
-              def guest?
-                not organization_member?
-              end
-            end
-
-            # Write an email to all officers.
-            recipient_addresses = Group.find_by("Alle Amtsträger").members.pluck(:email)
-
-          \end{ruby}
+                  def initialize(user)
+                    can :use, :admins_panel do
+                      user.in? Group.find_by("Alle Amtsträger").members
+                    end
+                  end
+                end
+              \end{ruby}
+          \end{itemize}
 
       \end{itemize}
     \end{column}
