@@ -72,7 +72,7 @@ task :includeonly do
   if include_only_a_part?
     log.section "includeonly"
 
-    relative_file_title = current_tex_file.gsub(base_path + "/", "").gsub(".tex", "").gsub(".md", "")
+    relative_file_title = current_tex_file.gsub(base_path + "/", "").gsub(".tex", "").gsub(".md", "").gsub(".erb", "")
     new_include_only_line = "\\includeonly{#{relative_file_title}}"
 
     log.info "Current file: #{current_tex_file}"
@@ -114,9 +114,9 @@ task :preprocessing => [:erb, :markdown]
 def erb_files
   if include_only_a_part?
     if current_tex_file.include? ".erb"
-      ["build/" + current_tex_file.gsub(base_path + "/", "")]
+      FileList["build/" + current_tex_file.gsub(base_path + "/", "")]
     else
-      []
+      FileList[]
     end
   else
     FileList["build/text/*.tex.md.erb"]
@@ -130,20 +130,18 @@ task :erb_info do
   log.info erb_files.join("\n")
 end
 
-erb_files.each do |source|
-  file source.ext('') => source do |t|
-    log.info "Converting #{t.source} to #{t.name}."
-    converted_content = ERB.new(File.read(t.source)).result
-    File.write(t.name, converted_content)
-  end
+rule ".tex.md" => ".tex.md.erb" do |t|
+  log.info "Converting #{t.source} to #{t.name}."
+  converted_content = ERB.new(File.read(t.source)).result
+  File.write(t.name, converted_content)
 end
 
 def markdown_files
   if include_only_a_part?
     if current_tex_file.include? ".tex.md"
-      ["build/" + current_tex_file.gsub(base_path + "/", "")]
+      FileList["build/" + current_tex_file.gsub(base_path + "/", "")]
     else
-      []
+      FileList[]
     end
   else
     FileList["build/text/*.tex.md"]
@@ -157,12 +155,11 @@ task :markdown_info do
   log.info markdown_files.join("\n")
 end
 
-markdown_files.each do |source|
-  file source.ext('') => source do |t|
-    sh "cat #{source} |sed '/^%/d' > #{source.ext('tmp')}" # remove tex comments
-    sh "pandoc #{t.source.ext('tmp')} --from markdown --to latex > #{t.name}"
-    rm source.ext('tmp')
-  end
+rule ".tex" => ".tex.md" do |t|
+  log.info "Converting #{t.source} to #{t.name}."
+  sh "cat #{t.source} |sed '/^%/d' > #{t.source.ext('tmp')}" # remove tex comments
+  sh "pandoc #{t.source.ext('tmp')} --from markdown --to latex > #{t.name}"
+  rm t.source.ext('tmp')
 end
 
 task :open do
