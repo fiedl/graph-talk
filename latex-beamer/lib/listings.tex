@@ -23,6 +23,13 @@
   linenos=false
 }
 
+\setminted[ruby]{
+  linenos=false,
+  frame=none
+}
+
 \newenvironment{bash}{\minted{bash}}{\endminted}
 
 \newcommand\inlineruby[1]{\mintinline[breaklines, breakafter=.]{ruby}{#1}}
+
+\newenvironment{ruby}{\minted{ruby}}{\endminted}
