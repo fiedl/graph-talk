@@ -24,10 +24,12 @@ show_pages = false if except.include? :pages
 show_time = false if except.include? :time
 
 highlight_all_members ||= false
-highlight_all_members = true if highlight.include? :all_members
-
 highlight_all_officers ||= false
+highlight_stud_links ||= false
+
+highlight_all_members = true if highlight.include? :all_members
 highlight_all_officers = true if highlight.include? :all_officers
+highlight_stud_links = true if highlight.include? :stud_links
 %>
 
 \begin{tikzpicture}[
@@ -125,6 +127,12 @@ highlight_all_officers = true if highlight.include? :all_officers
     \path (Nürnberg Alumni Schriftwart) to [highlightpath] (Gretel);
   <% end %>
 
+  <% if highlight_stud_links %>
+    \path (Studenten) to [highlightpath] (Max);
+    \path (Studenten) to [highlightpath] (Lena);
+    \path (Studenten) to [highlightpath] (Nürnberg Studenten Amtsträger);
+    \path (Studenten) to [highlightpath] (Nürnberg Studenten Schriftwart);
+  <% end %>
 
   <% if show_time %>
     \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_to: 2009} (Studenten);

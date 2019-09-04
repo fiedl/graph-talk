@@ -7,7 +7,8 @@
     \begin{column}{0.4\textwidth}
       \scalebox{0.6}{
         \centering
-        <%= render "sample_graph", except: [:pages, :time] %>
+        \only<1-2,4>{<%= render "sample_graph", except: [:pages, :time] %>}%
+        \only<3>{<%= render "sample_graph", except: [:pages, :time], highlight: :stud_links %>}%
       }
     \end{column}
 
@@ -16,11 +17,13 @@
         \item
           Implementation: \url{https://github.com/resgraph/acts-as-dag}
 
-          \begin{ruby}
-            class Group < ApplicationRecord
-              has_dag_links ancestor_class_names: %w(Group), descendant_class_names: %w(Group User)
-            end
-          \end{ruby}
+          \begin{onlyenv}<1-2>
+            \begin{ruby}
+              class Group < ApplicationRecord
+                has_dag_links ancestor_class_names: %w(Group), descendant_class_names: %w(Group User)
+              end
+            \end{ruby}
+          \end{onlyenv}
 
           \begin{onlyenv}<1>
             \begin{ruby}
@@ -40,6 +43,19 @@
               Group.find_by(name: "Gäste").ancestor_groups
             \end{ruby}
           \end{onlyenv}
+
+        \item<only@3>Callbacks manage *indirect links* in the sql database.
+          \begin{ruby}
+            Group.find_by(name: "Studenten").links_as_ancestor # =>
+              # <DagLink descendant: "Max",
+              #   direct: true, count: 1, ...>,
+              # <DagLink descendant: "Lena",
+              #   direct: true, count: 2, ...>,
+              # <DagLink descendant: "Amtsträger",
+              #   direct: true, count: 1, ...>,
+              # <DagLink descendant: "Schriftwart",
+              #   direct: false, count: 1, ...>
+          \end{ruby}
 
       \end{itemize}
     \end{column}
