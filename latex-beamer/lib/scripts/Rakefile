@@ -157,9 +157,23 @@ end
 
 rule ".tex" => ".tex.md" do |t|
   log.info "Converting #{t.source} to #{t.name}."
-  sh "cat #{t.source} |sed '/^%/d' > #{t.source.ext('tmp')}" # remove tex comments
+  content = File.read t.source
+
+  log.info "-> Removing tex comment lines"
+  content = content.split("\n").select { |line| not line.start_with? "%" }.join("\n")
+
+  log.info "-> Converting `inline code` to \\inlinecode{inline code}"
+  content = content.gsub(/`([^`]*)`/, '\inlinecode{\1}')
+
+  #sh "cat #{t.source} |sed '/^%/d' > #{t.source.ext('tmp')}" # remove tex comments
+
+  log.info "-> running pandoc markdown converter:"
+  File.write t.source.ext('tmp'), content
   sh "pandoc #{t.source.ext('tmp')} --from markdown --to latex > #{t.name}"
   rm t.source.ext('tmp')
+
+  #log.warning "-> Omitting pandoc conversion for now. Sorry."
+  #File.write t.name, content
 end
 
 task :open do
