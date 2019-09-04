@@ -1,0 +1,47 @@
+%!TEX TS-program = ../make.zsh
+
+## Approach: Acts As Dag
+
+\begin{frame}[t,fragile]{Approach: Acts As Dag}
+  \begin{columns}[T]
+    \begin{column}{0.4\textwidth}
+      \scalebox{0.6}{
+        \centering
+        <%= render "sample_graph", except: [:pages, :time] %>
+      }
+    \end{column}
+
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item
+          Implementation: \url{https://github.com/resgraph/acts-as-dag}
+
+          \begin{ruby}
+            class Group < ApplicationRecord
+              has_dag_links ancestor_class_names: %w(Group), descendant_class_names: %w(Group User)
+            end
+          \end{ruby}
+
+          \begin{onlyenv}<1>
+            \begin{ruby}
+              Group.find_by(name: "Jeder").child_users
+                # => []
+
+              Group.find_by(name: "Jeder").descendant_users
+                # => [Max, Lena, Hans, Gretel, Peter]
+            \end{ruby}
+          \end{onlyenv}
+
+          \begin{onlyenv}<2>
+            \begin{ruby}
+              Group.find_by(name: "Jeder").child_groups
+              Group.find_by(name: "Jeder").descendant_groups
+              Group.find_by(name: "Gäste").parent_groups
+              Group.find_by(name: "Gäste").ancestor_groups
+            \end{ruby}
+          \end{onlyenv}
+
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
