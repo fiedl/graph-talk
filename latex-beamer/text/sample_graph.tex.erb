@@ -1,12 +1,15 @@
 <%
 only ||= []
 except ||= []
+highlight ||= []
 
 only = [only] if only.kind_of? Symbol
 except = [except] if except.kind_of? Symbol
+highlight = [highlight] if highlight.kind_of? Symbol
 
 show_officers = true if show_officers.nil?
 show_all_officers = true if show_all_officers.nil?
+show_officer_assignments = true if show_officer_assignments.nil?
 show_all_members = true if show_all_members.nil?
 show_pages = true if show_pages.nil?
 show_time = true if show_time.nil?
@@ -19,6 +22,12 @@ end
 
 show_pages = false if except.include? :pages
 show_time = false if except.include? :time
+
+highlight_all_members ||= false
+highlight_all_members = true if highlight.include? :all_members
+
+highlight_all_officers ||= false
+highlight_all_officers = true if highlight.include? :all_officers
 %>
 
 \begin{tikzpicture}[
@@ -27,6 +36,7 @@ show_time = false if except.include? :time
     page/.style={circle, draw, fill=blue!40},
     link/.style={circle connection bar, fill},
     bglink/.style={link, fill=black!10},
+    highlightpath/.append style={circle connection bar switch color=from (red) to (red)},
   ]
 
   \graph [
@@ -65,7 +75,7 @@ show_time = false if except.include? :time
       <% end %>%
     };
 
-    <% if show_officers %> Nürnberg Studenten Schriftwart -> Lena; <% end %>
+    <% if show_officers && show_officer_assignments %> Nürnberg Studenten Schriftwart -> Lena; <% end %>
 
     Alumni -> {
       <% if show_pages %> Alumni Protokolle/"Protokolle" [page], <% end %>%
@@ -78,7 +88,7 @@ show_time = false if except.include? :time
       <% end %>%
     };
 
-    <% if show_officers %> Nürnberg Alumni Schriftwart -> Gretel; <% end %>
+    <% if show_officers && show_officer_assignments %> Nürnberg Alumni Schriftwart -> Gretel; <% end %>
 
     Gäste -> Peter [user];
 
@@ -97,6 +107,24 @@ show_time = false if except.include? :time
       \path (Alle Mitglieder) to [bglink] (Alumni);
     <% end %>
   \end{pgfonlayer}
+
+  <% if highlight_all_members %>
+    \path (Studenten) to [highlightpath] (Max);
+    \path (Studenten) to [highlightpath] (Lena);
+    \path (Alumni) to [highlightpath] (Hans);
+    \path (Alumni) to [highlightpath] (Gretel);
+    \path (Alle Mitglieder) to [highlightpath] (Studenten);
+    \path (Alle Mitglieder) to [highlightpath] (Alumni);
+  <% end %>
+
+  <% if highlight_all_officers %>
+    \path (Alle Amtsträger) to [highlightpath] (Alle Schriftwarte);
+    \path (Alle Schriftwarte) to [highlightpath] (Nürnberg Studenten Schriftwart);
+    \path (Nürnberg Studenten Schriftwart) to [highlightpath] (Lena);
+    \path (Alle Schriftwarte) to [highlightpath] (Nürnberg Alumni Schriftwart);
+    \path (Nürnberg Alumni Schriftwart) to [highlightpath] (Gretel);
+  <% end %>
+
 
   <% if show_time %>
     \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_to: 2009} (Studenten);
