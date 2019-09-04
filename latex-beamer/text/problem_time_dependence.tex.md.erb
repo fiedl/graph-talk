@@ -1,0 +1,30 @@
+%!TEX TS-program = ../make.zsh
+
+## Problem: Time Dependence
+
+\begin{frame}[t,fragile]{Problem: Time Dependence}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \scalebox{0.6}{
+        \centering
+        <%= render "sample_graph", except: [:pages, :all_officers, :all_members] %>%
+      }
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item What if the graph is time dependent?
+
+          Memberships can range from one to another point in time.
+
+        \item<only@2> We need:
+
+          \begin{ruby}
+            Group.find_by(name: "Studenten").members.now  # => [Lena]
+            Group.find_by(name: "Studenten").members.at_time( 3.year.ago)  # => [Max, Lena]
+          \end{ruby}
+
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
