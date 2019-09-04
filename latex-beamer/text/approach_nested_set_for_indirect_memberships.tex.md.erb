@@ -1,0 +1,102 @@
+%!TEX TS-program = ../make.zsh
+
+## Approach: Nested set
+
+\begin{frame}[t,fragile]{Approach: Nested set}
+  \begin{columns}[T]
+    \begin{column}{0.3\textwidth}
+      \scalebox{0.6}{
+        \centering<%= render "sample_graph", only: :tree, except: [:pages, :time] %>
+      }
+    \end{column}
+
+    \begin{column}{0.7\textwidth}
+      \begin{itemize}
+        \item<only@1-4> Idea: Each node has a `left` and a `right` number.
+        \item<only@2-> Picture the structure as nested circles:
+
+\begin{Verbatim}[fontsize=\tiny]
+ ___________________________________________________________________
+|  Root                                                             |
+|    ____________________________    ____________________________   |
+|   |  Child 1                  |   |  Child 2                  |   |
+|   |   __________   _________  |   |   __________   _________  |   |
+|   |  |  C 1.1  |  |  C 1.2 |  |   |  |  C 2.1  |  |  C 2.2 |  |   |
+1   2  3_________4  5________6  7   8  9_________10 11_______12 13  14
+|   |___________________________|   |___________________________|   |
+|___________________________________________________________________|
+\end{Verbatim}
+
+        \item<only@3-4> Then, finding out all members is only one query:
+
+          \begin{ruby}
+            class Group < ApplicatonRecord
+              def members
+                User.where("users.left is between ? and ?", self.left, self.right)
+              end
+            end
+          \end{ruby}
+
+        \item<only@4-4> Implementation: \url{https://github.com/rails/acts_as_nested_set/blob/master/lib/active_record/acts/nested_set.rb} by DHH
+
+        \item<only@5-> **Pros**: Getting all members instantaneous.
+
+        \item<only@6-> **Cons**:
+          \begin{itemize}
+            \item Moving, adding, or removing a node requires to modify lots of nodes.
+            \item If the modification is interrupted, the whole graph is corrupt.
+          \end{itemize}
+
+      \end{itemize}
+
+
+    %  \vspace*{-0.5cm}
+    %  \begin{ruby}
+    %    class Group < ApplicationRecord
+    %      has_many :direct_members, # ...
+    %      has_many :child_groups, # ...
+    %
+    %      def members
+    %        direct_members + child_groups.map(&:members).flatten
+    %      end
+    %    end
+    %  \end{ruby}
+    %
+    %  \medskip
+    %
+    %  **Implementation**: \url{https://github.com/amerine/acts_as_tree/blob/master/lib/acts_as_tree.rb} by DHH
+    %
+    %  \only<2->{**Pros**: Simple, no redundancies}
+    %
+    %  \only<3->{**Cons**: Performance}
+    %
+    %  \medskip
+    %  \begin{onlyenv}<4->
+    %    % How to test this in your_platform `rails console`:
+    %    %
+    %    %     # rails console
+    %    %     class Group
+    %    %       def test_members
+    %    %         child_users + child_groups.map(&:test_members).flatten
+    %    %       end
+    %    %     end
+    %    %
+    %    %     Group.find(2).descendant_groups.count
+    %    %     Group.find(2).descendant_users.count
+    %    %     Group.find(2).descendant_users.collect { |user| user.links_as_child }.flatten.count
+    %    %
+    %    %     Benchmark.measure { members = Group.find(2).test_members }
+    %    %
+    %    \begin{ruby}
+    %      # Test data set:
+    %      Group.count  # => 4126
+    %      User.count   # => 6204
+    %      Edge.count   # => 36134
+    %      Benchmark.measure { Group.find_by(name: "Ortsgruppen").members }  # => 19.04 seconds
+    %      Benchmark.measure { Group.find_by(name: "Nürnberg").members }  # => 0.53 seconds
+    %    \end{ruby}
+    %  \end{onlyenv}
+
+    \end{column}
+  \end{columns}
+\end{frame}
