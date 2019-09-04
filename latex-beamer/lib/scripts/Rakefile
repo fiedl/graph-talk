@@ -127,7 +127,7 @@ task :erb => [:copy_files_to_build_directory, :erb_info] + erb_files.ext('')
 
 task :erb_info do
   log.section "Preprocessing erb files"
-  log.info erb_files.join("\n")
+  log.info erb_files.join("\n").blue
 end
 
 rule ".tex.md" => ".tex.md.erb" do |t|
@@ -139,7 +139,7 @@ end
 def markdown_files
   if include_only_a_part?
     if current_tex_file.include? ".tex.md"
-      FileList["build/" + current_tex_file.gsub(base_path + "/", "")]
+      FileList["build/" + current_tex_file.gsub(".erb", "").gsub(base_path + "/", "")]
     else
       FileList[]
     end
@@ -152,7 +152,7 @@ task :markdown => [:copy_files_to_build_directory, :markdown_info] + markdown_fi
 
 task :markdown_info do
   log.section "Processing markdown files"
-  log.info markdown_files.join("\n")
+  log.info markdown_files.join("\n").blue
 end
 
 rule ".tex" => ".tex.md" do |t|
