@@ -11,3 +11,5 @@ _minted*
 *.vrb
 *.fdb_latexmk
 *.fls
+
+build

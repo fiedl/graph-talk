@@ -3,7 +3,9 @@
 #
 # Just type `rake` to run it.
 
-task :default => [:info, :compile, :clean_markdown, :open]
+require 'pry'
+
+task :default => [:info, :compile, :open]
 
 pdf_viewer = "open -a /Applications/Skim.app"
 
@@ -25,12 +27,16 @@ def current_tex_file
   ENV['TM_FILEPATH']
 end
 
+def build_path
+  "#{base_path}/build"
+end
+
 def pdf_file
   "build/#{project_name}.pdf"
 end
 
 def pdflatex_command
-  "lualatex --output-directory=build -interaction=nonstopmode -file-line-error-style -shell-escape"
+  "lualatex -interaction=nonstopmode -file-line-error-style -shell-escape"
 end
 
 def include_only_a_part?
@@ -43,37 +49,22 @@ task :info do
   log.info "Main tex file: #{main_tex_file}"
 end
 
-task :compile => [:dependencies, :includeonly, :markdown] do
-  log.section "pdflatex"
-  sh "cd #{base_path} && #{pdflatex_command} #{main_tex_file}"
+task :compile => [:copy_files_to_build_directory, :dependencies, :includeonly, :preprocessing] do
+  log.section "latex"
+  sh "cd #{build_path} && #{pdflatex_command} #{main_tex_file}"
 end
 
-if include_only_a_part?
-  if current_tex_file.include? ".md.tex"
-    task :markdown => current_tex_file.gsub(".md.tex", ".tex").gsub(base_path + "/", "")
-  else
-    task :markdown => []
-  end
-else
-  multitask :markdown => FileList["text/*.md.tex"].ext('').ext('.tex')
+task :copy_files_to_build_directory do
+  log.section "Copy to build directory"
+  log.info "The source files stay untouched in the root directory, but this script"
+  log.info "all source files into the build directory for pre-processing and compiling."
+  FileUtils.copy_entry "#{base_path}/#{main_tex_file}", "#{build_path}/#{main_tex_file}"
+  FileUtils.copy_entry "#{base_path}/text", "#{build_path}/text"
+  FileUtils.copy_entry "#{base_path}/img", "#{build_path}/img"
+  FileUtils.copy_entry "#{base_path}/lib", "#{build_path}/lib"
 end
 
-FileList["text/*.md.tex"].each do |source|
-  file source.ext('').ext('.tex') => source do |t|
-    sh "cat #{source} |sed '/^%/d' > #{source.ext('tmp')}" # remove tex comments
-    sh "pandoc #{t.source.ext('tmp')} --from markdown --to latex > #{t.name}"
-    rm source.ext('tmp')
-  end
-end
-
-task :clean_markdown do
-  # If the compiling has been successfull, remove the temporary tex file
-  # that has been generated from *.md.tex in order to avoid that the user
-  # accidentally edits this file, because it will be overwritten again.
-  FileList["text/*.md.tex"].ext('').ext('.tex').each do |f|
-    rm f if File.exists?(f)
-  end
-end
+task :dependencies => [:images, :bibliography]
 
 task :includeonly do
   new_include_only_line = "%\\includeonly{}"
@@ -84,10 +75,10 @@ task :includeonly do
     new_include_only_line = "\\includeonly{#{relative_file_title}}"
 
     log.info "Current file: #{current_tex_file}"
-    log.info "Writing '#{new_include_only_line}' to #{main_tex_file}."
+    log.info "Writing '#{new_include_only_line}' to #{build_path}/#{main_tex_file}."
   end
 
-  tex_code = File.read main_tex_file
+  tex_code = File.read "#{build_path}/#{main_tex_file}"
   tex_code = tex_code.split("\n").collect do |line|
     if line.include? "\\includeonly{"
       new_include_only_line
@@ -95,24 +86,16 @@ task :includeonly do
       line
     end
   end.join("\n")
-  File.open(main_tex_file, 'w') { |f| f.write tex_code }
-end
-
-task :dependencies => [:build_directories, :images, :bibliography]
-
-task :build_directories do
-  log.info "Creating build directory structure. Otherwise, pdflatex will fail."
-  log.info "See https://tex.stackexchange.com/q/64313/70789."
-  sh "mkdir -p build/text/appendix"
+  File.open("#{build_path}/#{main_tex_file}", 'w') { |f| f.write tex_code }
 end
 
 multitask :images => [:tikz_images]
 
-multitask :tikz_images => FileList['img/*.tikz'].ext('pdf')
+multitask :tikz_images => FileList['build/img/*.tikz'].ext('pdf')
 
-FileList['img/*.tikz'].each do |source|
+FileList['build/img/*.tikz'].each do |source|
   file source.ext('pdf') => source do
-    sh "cd img && pdflatex -interaction=nonstopmode -file-line-error-style #{File.basename(source)}"
+    sh "cd build/img && pdflatex -interaction=nonstopmode -file-line-error-style #{File.basename(source)}"
   end
 end
 
@@ -125,6 +108,35 @@ file "build/#{project_name}.bbl" do
   end
 end
 
+task :preprocessing => [:markdown]
+
+def markdown_files
+  if include_only_a_part?
+    if current_tex_file.include? ".tex.md"
+      ["build/" + current_tex_file.gsub(base_path + "/", "")]
+    else
+      []
+    end
+  else
+    FileList["build/text/*.tex.md"]
+  end
+end
+
+task :markdown => [:copy_files_to_build_directory, :markdown_info] + markdown_files.ext('')
+
+task :markdown_info do
+  log.section "Processing markdown files"
+  log.info markdown_files.join("\n")
+end
+
+markdown_files.each do |source|
+  file source.ext('') => source do |t|
+    sh "cat #{source} |sed '/^%/d' > #{source.ext('tmp')}" # remove tex comments
+    sh "pandoc #{t.source.ext('tmp')} --from markdown --to latex > #{t.name}"
+    rm source.ext('tmp')
+  end
+end
+
 task :open do
   log.section "open"
   sh "#{pdf_viewer} #{pdf_file}"
@@ -132,10 +144,5 @@ end
 
 task :clean do
   log.section "Cleaning up"
-  for extension in %w(aux bcf fdb_latexmk fls log pdf run.xml synctex.gz)
-    sh "rm build/*.#{extension} build/**/*.#{extension} || true"
-  end
-  for extension in %w(pdf log aux)
-    sh "rm img/*.#{extension} || true"
-  end
+  sh "rm -r #{build_path}"
 end
