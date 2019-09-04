@@ -1,0 +1,35 @@
+%!TEX TS-program = ../make.zsh
+
+## Problem: Indirect memberships
+
+\begin{frame}[fragile]{Problem: Indirect memberships}
+  \begin{columns}
+    \begin{column}{0.3\textwidth}
+      \scalebox{0.6}{
+        \centering<%= render "sample_graph", only: :tree, except: [:pages, :time] %>
+      }
+    \end{column}
+
+    \begin{column}{0.7\textwidth}
+
+      \begin{itemize}
+        \item Assuming a `Group` model that `has_many :direct_members`.
+
+          \begin{ruby}
+            Group.find_by(name: "Jeder").direct_members
+              # => []
+          \end{ruby}
+
+        \item We need indirect memberships:
+
+          \begin{ruby}
+            Group.find_by(name: "Jeder").members
+              # => [Max, Lena, Hans, Gretel, Peter]
+          \end{ruby}
+
+      \end{itemize}
+
+    \end{column}
+  \end{columns}
+\end{frame}
+

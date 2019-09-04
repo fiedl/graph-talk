@@ -1,7 +1,28 @@
-<% group_color ||= 'green' %>
+<%
+only ||= []
+except ||= []
+
+only = [only] if only.kind_of? Symbol
+except = [except] if except.kind_of? Symbol
+
+show_officers = true if show_officers.nil?
+show_all_officers = true if show_all_officers.nil?
+show_all_members = true if show_all_members.nil?
+show_pages = true if show_pages.nil?
+show_time = true if show_time.nil?
+
+if only.include? :tree
+  show_officers = false
+  show_all_officers = false
+  show_all_members = false
+end
+
+show_pages = false if except.include? :pages
+show_time = false if except.include? :time
+%>
 
 \begin{tikzpicture}[
-    group/.style={circle, draw, fill=<%= group_color%>!50},
+    group/.style={circle, draw, fill=green!50},
     user/.style={circle, draw, fill=yellow!30},
     page/.style={circle, draw, fill=blue!40},
     link/.style={circle connection bar, fill},
@@ -16,9 +37,10 @@
       level distance=0.5in,
       sibling distance=0.5in
       ] {
-    Jeder [group] -> Alle Mitglieder [group];
+    Jeder [group];
+    <% if show_all_members %> Jeder -> Alle Mitglieder [group]; <% end %>
     Jeder -> Ortsgruppen [group];
-    Jeder -> Alle Amtsträger [group];
+    <% if show_all_officers %> Jeder -> Alle Amtsträger [group]; <% end %>
 
     Ortsgruppen -> {
       Berlin [group],
@@ -33,43 +55,52 @@
     };
 
     Studenten -> {
-      Studenten Protokolle/"Protokolle" [page],
+      <% if show_pages %> Studenten Protokolle/"Protokolle" [page], <% end %>%
       Max [user],
-      Lena [user],
-      Nürnberg Studenten Amtsträger/"Amtsträger" [group] -> {
-        Nürnberg Studenten Schriftwart/"Schriftwart" [group]
-      }
+      Lena [user]%
+      <% if show_officers %>,
+        Nürnberg Studenten Amtsträger/"Amtsträger" [group] -> {
+          Nürnberg Studenten Schriftwart/"Schriftwart" [group]
+        }
+      <% end %>%
     };
 
-    Nürnberg Studenten Schriftwart -> Lena;
+    <% if show_officers %> Nürnberg Studenten Schriftwart -> Lena; <% end %>
 
     Alumni -> {
-      Alumni Protokolle/"Protokolle" [page],
+      <% if show_pages %> Alumni Protokolle/"Protokolle" [page], <% end %>%
       Hans [user],
-      Gretel [user],
-      Nürnberg Alumni Amtsträger/"Amtsträger" [group] -> {
-        Nürnberg Alumni Schriftwart/"Schriftwart" [group]
-      }
+      Gretel [user]%
+      <% if show_officers %>,
+        Nürnberg Alumni Amtsträger/"Amtsträger" [group] -> {
+          Nürnberg Alumni Schriftwart/"Schriftwart" [group]
+        }
+      <% end %>%
     };
 
-    Nürnberg Alumni Schriftwart -> Gretel;
+    <% if show_officers %> Nürnberg Alumni Schriftwart -> Gretel; <% end %>
 
     Gäste -> Peter [user];
 
-    Alle Amtsträger -> Alle Schriftwarte [group] -> Leitfaden [page];
-
-    Alle Mitglieder -> Verbandszeitschrift [page] -> Ausgabe 1 [page];
+    <% if show_all_officers %> Alle Amtsträger -> Alle Schriftwarte [group] <% if show_pages %> -> Leitfaden [page] <% end %>; <% end %>
+    <% if show_all_members %> Alle Mitglieder <% if show_pages %> -> Verbandszeitschrift [page] -> Ausgabe 1 [page] <% end %>; <% end %>
   };
 
   \begin{pgfonlayer}{background}
-    \path (Alle Schriftwarte) to [bglink] (Nürnberg Studenten Schriftwart);
-    \path (Alle Schriftwarte) to [bglink] (Nürnberg Alumni Schriftwart);
+    <% if show_all_officers %>
+      \path (Alle Schriftwarte) to [bglink] (Nürnberg Studenten Schriftwart);
+      \path (Alle Schriftwarte) to [bglink] (Nürnberg Alumni Schriftwart);
+    <% end %>
 
-    \path (Alle Mitglieder) to [bglink] (Studenten);
-    \path (Alle Mitglieder) to [bglink] (Alumni);
+    <% if show_all_members %>
+      \path (Alle Mitglieder) to [bglink] (Studenten);
+      \path (Alle Mitglieder) to [bglink] (Alumni);
+    <% end %>
   \end{pgfonlayer}
 
-  \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_to: 2009} (Studenten);
-  \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_from: 2009} (Alumni);
+  <% if show_time %>
+    \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_to: 2009} (Studenten);
+    \draw (Max) edge [link, color=red] node [fill=white, above left, draw=red] {valid\_from: 2009} (Alumni);
+  <% end %>
 
 \end{tikzpicture}
