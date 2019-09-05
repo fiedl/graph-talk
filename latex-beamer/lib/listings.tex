@@ -31,6 +31,13 @@
   breakafter=.(
 }
 
+\setminted[cypher]{
+  linenos=false,
+  frame=none,
+  breaklines,
+  breakafter=\>
+}
+
 \newenvironment{bash}{\minted{bash}}{\endminted}
 
 \newcommand\inlineruby[1]{\mintinline[breaklines, breakafter=.]{ruby}{#1}}
@@ -38,3 +45,4 @@
 \newcommand\inlinecode[1]{\inlineruby{#1}}
 
 \newenvironment{ruby}{\minted{ruby}}{\endminted}
+\newenvironment{cypher}{\minted{cypher}}{\endminted}
