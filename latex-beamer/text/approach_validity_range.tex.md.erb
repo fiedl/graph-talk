@@ -1,0 +1,53 @@
+%!TEX TS-program = ../make.zsh
+
+## Approach: Validity Range
+
+\begin{frame}[t,fragile]{Approach: Validity Range}
+  \begin{columns}[T]
+    \begin{column}{0.4\textwidth}
+      \hspace*{-7mm}
+      \scalebox{0.6}{
+        \centering
+        <%= render "sample_graph", except: [:pages, :all_officers, :all_members, :events] %>%
+      }
+    \end{column}
+
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item Idea: Add columns `valid_from` and `valid_to` to the graph links table.
+
+          \begin{onlyenv}<2-3>
+            \begin{ruby}
+              User.find_by(name: "Max").links_as_child  # =>
+                # <DagLink valid_from: nil, valid_to: "2018-01-01", ancestor: "Studenten", ...>,
+                # <DagLink valid_from: "2018-01-01", valid_to: nil, ancestor: "Alumni", ...>
+            \end{ruby}
+          \end{onlyenv}
+          \begin{onlyenv}<3>
+            Then define scopes:
+
+            \begin{ruby}
+              class DagLink < ApplicationRecord
+                scope :now, -> { where('valid_from IS NULL OR valid_from <= ?', Time.zone.now).where('valid_to IS NULL OR valid_to > ?', Time.zone.now) }
+                scope :past, -> # ...
+              end
+            \end{ruby}
+          \end{onlyenv}
+
+        \item<only@4> Implementation: \url{https://github.com/fiedl/your_platform/blob/master/app/models/concerns/membership_validity_range.rb}
+
+        \item<only@5-> **Pros**
+          \begin{itemize}
+            \item Easy-to-use interface
+            \item Can expand the existing acts-as-dag gem.
+          \end{itemize}
+        \item<only@6-> **Cons**:
+          \begin{itemize}
+            \item No recurring mmberships
+            \item Complexity when calculating validity range of indirect memberships.
+          \end{itemize}
+
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
