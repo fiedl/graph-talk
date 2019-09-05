@@ -7,9 +7,9 @@
     \begin{column}{0.4\textwidth}
       \scalebox{0.6}{
         \centering
-        \only<1-2,4>{<%= render "sample_graph", except: [:pages, :time] %>}%
-        \only<3>{<%= render "sample_graph", except: [:pages, :time], highlight: :stud_links %>}%
-        \only<5>{<%= render "sample_graph", except: [:pages, :time], show_indirect_links: true %>}%
+        \only<1-2,4>{<%= render "sample_graph", except: [:pages, :time, :events] %>}%
+        \only<3>{<%= render "sample_graph", except: [:pages, :time, :events], highlight: :stud_links %>}%
+        \only<5>{<%= render "sample_graph", except: [:pages, :time, :events], show_indirect_links: true %>}%
       }
     \end{column}
 

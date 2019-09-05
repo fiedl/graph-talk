@@ -7,13 +7,13 @@
     \begin{column}{0.4\textwidth}
       \scalebox{0.6}{
         \centering
-        \only<1-2>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officers: false, show_officer_assignments: false %>}%
-        \only<3>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false, show_officer_assignments: false %>}%
-        \only<4>{<%= render "sample_graph", except: [:pages, :time], show_all_officers: false, show_all_members: false %>}%
-        \only<5>{<%= render "sample_graph", except: [:pages, :time], show_all_members: false %>}%
-        \only<6>{<%= render "sample_graph", except: [:pages, :time] %>}%
-        \only<7>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_members %>}%
-        \only<8-9>{<%= render "sample_graph", except: [:pages, :time], highlight: :all_officers %>}%
+        \only<1-2>{<%= render "sample_graph", except: [:pages, :time, :events], show_all_officers: false, show_all_members: false, show_officers: false, show_officer_assignments: false %>}%
+        \only<3>{<%= render "sample_graph", except: [:pages, :time, :events], show_all_officers: false, show_all_members: false, show_officer_assignments: false %>}%
+        \only<4>{<%= render "sample_graph", except: [:pages, :time, :events], show_all_officers: false, show_all_members: false %>}%
+        \only<5>{<%= render "sample_graph", except: [:pages, :time, :events], show_all_members: false %>}%
+        \only<6>{<%= render "sample_graph", except: [:pages, :time, :events] %>}%
+        \only<7>{<%= render "sample_graph", except: [:pages, :time, :events], highlight: :all_members %>}%
+        \only<8-9>{<%= render "sample_graph", except: [:pages, :time, :events], highlight: :all_officers %>}%
       }
     \end{column}
 
