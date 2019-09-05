@@ -1,0 +1,21 @@
+%!TEX TS-program = ../make.zsh
+
+\begin{frame}[t,fragile]{In Practice}
+
+  \begin{itemize}
+    \item<1-> We use this in \url{https://github.com/fiedl/your_platform}
+    \item<2-> No silver bullet, yet
+    \item<2-> We use a mixture of
+      \begin{itemize}
+        \item Recursions
+        \item Acts As Dag with validity-range extension
+        \item Neo4j via Neography
+        \item Model caching
+      \end{itemize}
+    \item<3-> Neo4j running in docker
+    \item<4-> Namespacing in wrapper for multi-tenancy or multi-staging environments
+  \end{itemize}
+
+  \includegraphics[width=\textwidth]{img/graph-groups-erlanger-wingolf}
+\end{frame}
+
