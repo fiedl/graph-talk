@@ -32,6 +32,12 @@ show_events = false if except.include? :events
 highlight_all_members ||= false
 highlight_all_officers ||= false
 highlight_stud_links ||= false
+highlight_max_can_read_stud_protokolle ||= false
+highlight_max_cannot_read_alumni_protokolle ||= false
+highlight_max_can_read_zeitschrift ||= false
+highlight_max_can_read_zeitschrift_ausgabe ||= false
+highlight_gretel_can_read_programmheft ||= false
+highlight_gretel_cannot_read_stud_protokolle ||= false
 
 highlight_all_members = true if highlight.include? :all_members
 highlight_all_officers = true if highlight.include? :all_officers
@@ -46,7 +52,8 @@ highlight_stud_links = true if highlight.include? :stud_links
     link/.style={circle connection bar, fill},
     bglink/.style={link, fill=black!10},
     highlightpath/.append style={circle connection bar switch color=from (red) to (red)},
-    indirectlink/.append style={circle connection bar switch color=from (black!30) to (black!30)}
+    indirectlink/.append style={circle connection bar switch color=from (black!30) to (black!30)},
+    noconnection/.style={draw=red, dashed, line width=10pt}
   ]
 
   \graph [
@@ -176,6 +183,36 @@ highlight_stud_links = true if highlight.include? :stud_links
     \path (Studenten) to [highlightpath] (Lena);
     \path (Studenten) to [highlightpath] (Nürnberg Studenten Amtsträger);
     \path (Studenten) to [highlightpath] (Nürnberg Studenten Schriftwart);
+  <% end %>
+
+  <% if highlight_max_can_read_stud_protokolle %>
+    \path (Max) to [highlightpath] (Studenten) to [highlightpath] (Studenten Protokolle);
+  <% end %>
+
+  <% if highlight_max_cannot_read_alumni_protokolle %>
+    \path (Alumni Protokolle) to [highlightpath] (Alumni);
+    \path [noconnection] (Alumni) -- (Max);
+  <% end %>
+
+  <% if highlight_max_can_read_zeitschrift || highlight_max_can_read_zeitschrift_ausgabe %>
+    \path (Max) to [highlightpath] (Studenten);
+    \path (Studenten) to [highlightpath] (Alle Mitglieder);
+    \path (Alle Mitglieder) to [highlightpath] (Verbandszeitschrift);
+  <% end %>
+  <% if highlight_max_can_read_zeitschrift_ausgabe %>
+    \path (Verbandszeitschrift) to [highlightpath] (Ausgabe 1);
+  <% end %>
+
+  <% if highlight_gretel_can_read_programmheft %>
+    \path (Gretel) to [highlightpath] (Teilnehmer);
+    \path (Programmheft) to [highlightpath] (Teilnehmer);
+  <% end %>
+
+  <% if highlight_gretel_cannot_read_stud_protokolle %>
+    \path (Gretel) to [highlightpath] (Teilnehmer);
+    \path (Sommerfest) to [highlightpath] (Teilnehmer);
+    \path [noconnection] (Sommerfest) -- (Studenten);
+    \path (Studenten Protokolle) to [highlightpath] (Studenten);
   <% end %>
 
   <% if show_time %>

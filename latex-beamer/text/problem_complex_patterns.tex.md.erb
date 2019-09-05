@@ -4,15 +4,35 @@
 
 \begin{frame}[t,fragile]{Problem: Complex Patterns}
   \begin{columns}[T]
-    \begin{column}{0.4\textwidth}
-      \scalebox{0.6}{
+    \begin{column}{0.5\textwidth}
+      \scalebox{0.35}{
         \centering
-        <%= render "sample_graph", except: [:time] %>%
+        \only<1>{<%= render "sample_graph", except: [:time] %>}%
+        \only<2>{<%= render "sample_graph", except: [:time], highlight_max_can_read_stud_protokolle: true %>}%
+        \only<3>{<%= render "sample_graph", except: [:time], highlight_max_can_read_stud_protokolle: true, highlight_max_cannot_read_alumni_protokolle: true %>}%
+        \only<4>{<%= render "sample_graph", except: [:time], highlight_max_can_read_zeitschrift: true %>}%
+        \only<5>{<%= render "sample_graph", except: [:time], highlight_max_can_read_zeitschrift_ausgabe: true %>}%
+        \only<6>{<%= render "sample_graph", except: [:time], highlight_gretel_can_read_programmheft: true %>}%
+        \only<7>{<%= render "sample_graph", except: [:time], highlight_gretel_cannot_read_stud_protokolle: true %>}%
       }
     \end{column}
 
-    \begin{column}{0.6\textwidth}
-      Complex patterns.
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item<only@1-> Ability to read a `Page`:
+          \begin{itemize}
+            \item<only@2-5> A user `can :read` a page that belongs to a group the user is member of.
+
+              \only<3->{He `cannot :read` a page that belongs to a group the user is no member of.}
+
+            \item<only@4-5> A user `can :read` a page that belongs to a group the user is indirectly member of.
+            \item<only@5-5> A user `can :read` sub pages of pages that belong to a group the user is (directly or indirectly) member of.
+
+            \item<only@6-> A user `can :read` a page of an attendees group if she is member of that group.
+
+              \only<7->{But she `cannot :read` a page of an ancestor group of the attendees group that is only connected through the event (because attending an event of a group does not make you a member of that group).}
+          \end{itemize}
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
