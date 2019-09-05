@@ -1,0 +1,31 @@
+%!TEX TS-program = ../make.zsh
+
+## Approach: Use Acts As Dag for Complex Patterns
+
+\begin{frame}[t,fragile]{Approach: Use Acts As Dag for Complex Patterns}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \scalebox{0.35}{
+        \centering
+        <%= render "sample_graph", except: [:time], highlight_gretel_can_read_programmheft: true, highlight_gretel_cannot_read_stud_protokolle: true %>
+      }
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{ruby}
+        class Ability
+          include CanCan::Ability
+          def initialize(user)
+            can :read, Page do |page|
+              page.parent_groups.collect { |group|
+                group.descendant_users.now.include? user
+              }.reduce(:|)
+              and
+              (page.ancestor_evnets.none? || (page.ancestor_events & user.ancestor_events).any?)
+            end
+          end
+        end
+      \end{ruby}
+    \end{column}
+  \end{columns}
+\end{frame}
