@@ -59,6 +59,7 @@ task :copy_files_to_build_directory do
   log.section "Copy to build directory"
   log.info "The source files stay untouched in the root directory, but this script"
   log.info "all source files into the build directory for pre-processing and compiling."
+  FileUtils.mkdir_p build_path
   FileUtils.copy_entry "#{base_path}/#{main_tex_file}", "#{build_path}/#{main_tex_file}"
   FileUtils.copy_entry "#{base_path}/text", "#{build_path}/text"
   FileUtils.copy_entry "#{base_path}/img", "#{build_path}/img"
