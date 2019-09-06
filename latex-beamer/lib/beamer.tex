@@ -18,7 +18,7 @@
 {%
   \leavevmode%
   \hbox{\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm]{author in head/foot}%
-  \inserttitle%
+  \insertshorttitle%
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm plus1fil]{author in head/foot}%
     \usebeamerfont{author in head/foot}\insertshortauthor\hfill\insertpagenumber
@@ -32,7 +32,7 @@
 
 \beamertemplatenavigationsymbolsempty
 
-\setbeamertemplate{footline}[author, title, frame number]
+%\setbeamertemplate{footline}[author, title, frame number]
 
 \newcommand{\vtiny}{\fontsize{6}{1}\selectfont}
 \usepackage[absolute,overlay]{textpos}
@@ -88,13 +88,13 @@
 \setitemize{label=\textbullet}
 \setdescription{labelindent=0pt,labelwidth=2.1cm,labelsep*=1em,leftmargin=!, font={\mdseries\sffamily\color{blue}}}
 
-% Slide number in footer
-\newcommand*\oldmacro{}%
-\let\oldmacro\insertshorttitle%
-\renewcommand*\insertshorttitle{%
-   \oldmacro\hfill%
-   %\insertframenumber\,/\,\inserttotalframenumber}
-   \insertframenumber}
+%% Slide number in footer
+%\newcommand*\oldmacro{}%
+%\let\oldmacro\insertshorttitle%
+%\renewcommand*\insertshorttitle{%
+%   \oldmacro\hfill%
+%   %\insertframenumber\,/\,\inserttotalframenumber}
+%   \insertframenumber}
 
 % % Logo in header
 % % https://tex.stackexchange.com/a/347635/70789
