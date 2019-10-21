@@ -19,7 +19,7 @@
                 group.descendant_users.now.include? user
               }.reduce(:|)
               and
-              (page.ancestor_evnets.none? || (page.ancestor_events & user.ancestor_events).any?)
+              (page.ancestor_events.none? || (page.ancestor_events & user.ancestor_events).any?)
             end
           end
         end
